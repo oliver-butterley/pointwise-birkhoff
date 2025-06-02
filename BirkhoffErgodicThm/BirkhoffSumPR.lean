@@ -37,20 +37,20 @@ theorem birkhoffAverage_of_invariant {M : Type*} [AddCommMonoid M] [Module R M] 
 
 -- To go in `Dynamics/BirkhoffSum/Average`
 -- Note: need something more than `[AddCommMonoid M]` here to have subtraction.
-lemma birkhoffAverage_neg {M : Type*} [AddCommGroup M] [Module R M]
-    {f : α → α} {φ : α → M} :
+lemma birkhoffAverage_neg {M : Type*} [AddCommGroup M] [Module R M] {f : α → α} {φ : α → M} :
     birkhoffAverage R f (-φ) = - birkhoffAverage R f φ := by
   funext n x
   simp [birkhoffAverage, birkhoffSum]
 
 -- To go in `Dynamics/BirkhoffSum/Average`
 open Finset in
-lemma birkhoffAverage_add {M : Type*} [AddCommGroup M] [Module R M] {f : α → α} {φ ψ : α → M} :
+lemma birkhoffAverage_add {M : Type*} [AddCommMonoid M] [Module R M] {f : α → α} {φ ψ : α → M} :
     birkhoffAverage R f (φ + ψ) = birkhoffAverage R f φ + birkhoffAverage R f ψ := by
   funext n x
   simp [birkhoffAverage, birkhoffSum, sum_add_distrib]
 
 -- To go in `Dynamics/BirkhoffSum/Average`
+-- Note: need something more than `[AddCommMonoid M]` here to have subtraction.
 open Finset in
 lemma birkhoffAverage_sub {M : Type*} [AddCommGroup M] [Module R M] {f : α → α} {φ ψ : α → M} :
     birkhoffAverage R f (φ - ψ) = birkhoffAverage R f φ - birkhoffAverage R f ψ := by
