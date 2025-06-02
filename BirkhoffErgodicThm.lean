@@ -321,8 +321,8 @@ theorem birkhoffErgodicTheorem_aux {ε : ℝ} (hε : 0 < ε) (hf : MeasurePreser
     invariant_of_measurable_invariants stronglyMeasurable_condExp.measurable
 
   intro n hn
-  simp [ψ, birkhoffAverage_sub, birkhoffAverage_add, birkhoffAverage_eq_of_invariant
-    (show _ = fun _ ↦ ε from rfl) hn, birkhoffAverage_eq_of_invariant condexpφ_invariant hn]
+  simp [ψ, birkhoffAverage_sub, birkhoffAverage_add, birkhoffAverage_of_invariant
+    (show _ = fun _ ↦ ε from rfl) hn, birkhoffAverage_of_invariant condexpφ_invariant hn]
 
 theorem birkhoffErgodicTheorem  (hf : MeasurePreserving f μ μ) (hφ : Integrable φ μ)
     (hφ' : Measurable φ) :
