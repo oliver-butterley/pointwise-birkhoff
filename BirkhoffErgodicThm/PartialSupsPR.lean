@@ -1,6 +1,8 @@
 import Mathlib
 
--- To be added to `Mathlib/Order/PartialSups`. Correct name?
+-- To be added to `Mathlib/Order/PartialSups`.
+-- Correct name? I think it should be `comp` not `map`:
+-- [https://leanprover-community.github.io/contribute/naming.html#names-of-symbols]
 lemma map_partialSups {α β F ι : Type*} [Preorder ι] [LocallyFiniteOrderBot ι]
     [SemilatticeSup α] [SemilatticeSup β] [FunLike F α β] [SupHomClass F α β]
     (f : ι → α) (g : F) : partialSups (g ∘ f) = g ∘ partialSups f := by
