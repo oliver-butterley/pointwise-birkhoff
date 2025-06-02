@@ -3,7 +3,7 @@ import Mathlib
 /- The following is a generalization but can it be more general? The induction proof requires
 `[SuccOrder ι]` but does the result require this? -/
 
--- To be added to `Mathlib/Order/PartialSups`
+-- To be added to `Mathlib/Order/PartialSups`. Correct name?
 lemma map_partialSups' {α β F ι : Type*} [LinearOrder ι] [LocallyFiniteOrder ι] [SuccOrder ι]
     [OrderBot ι] [SemilatticeSup α] [SemilatticeSup β] [FunLike F α β] [SupHomClass F α β]
     (f : ι → α) (g : F) : partialSups (g ∘ f) = g ∘ partialSups f :=
