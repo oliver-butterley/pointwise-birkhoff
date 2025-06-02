@@ -3,6 +3,7 @@ import Mathlib
 lemma map_partialSups
     [SemilatticeSup α] [SemilatticeSup β] [FunLike F α β] [SupHomClass F α β]
     (f : ℕ → α) (g : F) : partialSups (g ∘ f) = g ∘ partialSups f := by
+
   funext n; induction n <;> simp [*]
 
 open OrderIso in
@@ -12,12 +13,13 @@ lemma add_partialSups
   change (partialSups (addLeft c ∘ _)) n = _
   rw [map_partialSups f (addLeft c)]; rfl
 
+/- Note for curiosity with `partialSups_succ'`: In `partialSups_succ` slightly weaker assumptions on
+`ι` are used: `[LinearOrder ι] [LocallyFiniteOrderBot ι] [SuccOrder ι]`. However using just this
+breaks the statement because it can't sythesise `[OrderBot ι]`. These assumptions permit an empty
+set and perhaps it can't use the hypothesis to exclude this and guarantee the existence of `⊥`.
+The assumptions used here match those of `partialSups_bot` in the same file. -/
+
 -- To be added to `Mathlib/Order/PartialSups`
--- In `partialSups_succ` slightly weaker assumptions on `ι` are used:
--- `[LinearOrder ι] [LocallyFiniteOrderBot ι] [SuccOrder ι]`.
--- However using just this breaks the statement because it can't sythesise `[OrderBot ι]`.
--- These assumptions permit an empty set and perhaps it can't use the hypothesis to exclude this and
--- guarantee the existence of `⊥`.
 open Finset in
 lemma partialSups_succ' {α : Type u_1} {ι : Type u_2} [SemilatticeSup α] [LinearOrder ι]
     [LocallyFiniteOrder ι] [SuccOrder ι] [OrderBot ι] (f : ι → α) (i : ι) :
