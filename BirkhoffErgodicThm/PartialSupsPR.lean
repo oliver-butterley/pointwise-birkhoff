@@ -1,7 +1,7 @@
 import Mathlib
 
 -- To be added to `Mathlib/Order/PartialSups`. Correct name?
-lemma map_partialSups' {α β F ι : Type*} [Preorder ι] [LocallyFiniteOrderBot ι]
+lemma map_partialSups {α β F ι : Type*} [Preorder ι] [LocallyFiniteOrderBot ι]
     [SemilatticeSup α] [SemilatticeSup β] [FunLike F α β] [SupHomClass F α β]
     (f : ι → α) (g : F) : partialSups (g ∘ f) = g ∘ partialSups f := by
   funext _; simp [partialSups]
@@ -12,7 +12,7 @@ lemma add_partialSups {ι α : Type*} [Preorder ι] [LocallyFiniteOrderBot ι] [
     [CovariantClass α α ((· + ·)) (· ≤ ·)] (f : ι → α) (c : α) (i : ι) :
     partialSups (c + f ·) i = c + partialSups f i := by
   change (partialSups (addLeft c ∘ _)) i = _
-  rw [map_partialSups' f (addLeft c)]; rfl
+  rw [map_partialSups f (addLeft c)]; rfl
 
 /- Note for curiosity with `partialSups_succ'`: In `partialSups_succ` slightly weaker assumptions on
 `ι` are used: `[LinearOrder ι] [LocallyFiniteOrderBot ι] [SuccOrder ι]`. However using just this
