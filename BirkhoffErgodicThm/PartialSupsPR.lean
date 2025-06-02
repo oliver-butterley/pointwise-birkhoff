@@ -19,10 +19,8 @@ lemma add_partialSups
 -- These assumptions permit an empty set and perhaps it can't use the hypothesis to exclude this and
 -- guarantee the existence of `⊥`.
 open Finset in
-lemma partialSups_succ' {α : Type u_1} {ι : Type u_2}
-    [SemilatticeSup α]
-    [LinearOrder ι] [LocallyFiniteOrder ι] [SuccOrder ι] [OrderBot ι]
-    (f : ι → α) (i : ι) :
+lemma partialSups_succ' {α : Type u_1} {ι : Type u_2} [SemilatticeSup α] [LinearOrder ι]
+    [LocallyFiniteOrder ι] [SuccOrder ι] [OrderBot ι] (f : ι → α) (i : ι) :
     (partialSups f) (Order.succ i) = f ⊥ ⊔ (partialSups (f ∘ Order.succ)) i := by
   refine Succ.rec (by simp) (fun j hj h ↦ ?_) (bot_le (a := i))
   have : (partialSups (f ∘ Order.succ)) (Order.succ j) =
