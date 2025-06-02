@@ -1,7 +1,8 @@
 import Mathlib
 
 /- The following is a generalization but can it be more general? The induction proof requires
-`[SuccOrder ι]` but does the result require this? -/
+`[SuccOrder ι]` but does the result require this? However this might be pointless generality, is
+there any use case? -/
 
 -- To be added to `Mathlib/Order/PartialSups`. Correct name?
 lemma map_partialSups' {α β F ι : Type*} [LinearOrder ι] [LocallyFiniteOrder ι] [SuccOrder ι]
