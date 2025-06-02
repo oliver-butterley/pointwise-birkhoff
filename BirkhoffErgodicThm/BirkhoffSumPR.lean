@@ -20,19 +20,19 @@ theorem birkhoffSum_of_invariant [AddCommMonoid M] {φ : α → M}
   conv in fun _ => _ => intro k; change (φ ∘ f^[k]) x; rw [invariant_iter h k]
   simp
 
+variable (R : Type*) {α M : Type*} [DivisionSemiring R] [AddCommMonoid M] [Module R M]
+
 -- To go in `Dynamics/BirkhoffSum/Average`
 open Finset in
 /-- If a function `φ` is invariant under a function `f` (i.e., `φ ∘ f = φ`),
 then the Birkhoff average of `φ` over `f` for `n` iterations is equal to `φ`
 provided `0 < n`. -/
-theorem birkhoffAverage_of_invariant
-    {φ : α → ℝ} (h : φ ∘ f = φ) (hn : 0 < n) : birkhoffAverage ℝ f φ n = φ := by
+theorem birkhoffAverage_of_invariant (f : α → α) [CharZero R]
+    {φ : α → M} (h : φ ∘ f = φ) {n : ℕ} (hn : 0 < n) : birkhoffAverage R f φ n = φ := by
   funext x
-  unfold birkhoffAverage
-  rw [birkhoffSum_of_invariant h]
-  refine (inv_smul_eq_iff₀ ?_).mpr ?_
-  · norm_cast; linarith
-  · simp
+  simp only [birkhoffAverage, birkhoffSum_of_invariant h, Pi.smul_apply]
+  refine (inv_smul_eq_iff₀ ?_).mpr (by norm_cast)
+  exact Nat.cast_ne_zero.mpr <| Nat.ne_zero_of_lt hn
 
 -- To go in `Dynamics/BirkhoffSum/Average`
 lemma birkhoffAverage_neg {φ : α → ℝ} :
