@@ -4,28 +4,15 @@ import Mathlib
 lemma map_partialSups' {α β F ι : Type*} [Preorder ι] [LocallyFiniteOrderBot ι]
     [SemilatticeSup α] [SemilatticeSup β] [FunLike F α β] [SupHomClass F α β]
     (f : ι → α) (g : F) : partialSups (g ∘ f) = g ∘ partialSups f := by
-  funext _
-  simp [partialSups]
-
-lemma map_partialSups
-    [SemilatticeSup α] [SemilatticeSup β] [FunLike F α β] [SupHomClass F α β]
-    (f : ℕ → α) (g : F) : partialSups (g ∘ f) = g ∘ partialSups f := by
-  exact map_partialSups' f g
+  funext _; simp [partialSups]
 
 -- To be added to `Mathlib/Order/PartialSups`. Correct name?
 open OrderIso in
-lemma add_partialSups' {ι α : Type*} [Preorder ι] [LocallyFiniteOrderBot ι] [Lattice α] [AddGroup α]
+lemma add_partialSups {ι α : Type*} [Preorder ι] [LocallyFiniteOrderBot ι] [Lattice α] [AddGroup α]
     [CovariantClass α α ((· + ·)) (· ≤ ·)] (f : ι → α) (c : α) (i : ι) :
     partialSups (c + f ·) i = c + partialSups f i := by
   change (partialSups (addLeft c ∘ _)) i = _
-  rw [map_partialSups' f (addLeft c)]
-  rfl
-
-open OrderIso in
-lemma add_partialSups
-    [Lattice α] [AddGroup α] [CovariantClass α α ((· + ·)) (· ≤ ·)]
-    (f : ℕ → α) (c : α) : partialSups (c + f ·) n = c + partialSups f n := by
-  exact add_partialSups' f c n
+  rw [map_partialSups' f (addLeft c)]; rfl
 
 /- Note for curiosity with `partialSups_succ'`: In `partialSups_succ` slightly weaker assumptions on
 `ι` are used: `[LinearOrder ι] [LocallyFiniteOrderBot ι] [SuccOrder ι]`. However using just this
