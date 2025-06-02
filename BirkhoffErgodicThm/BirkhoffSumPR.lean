@@ -20,39 +20,39 @@ theorem birkhoffSum_of_invariant [AddCommMonoid M] {φ : α → M}
   conv in fun _ => _ => intro k; change (φ ∘ f^[k]) x; rw [invariant_iter h k]
   simp
 
-variable {R : Type*} {α M : Type*} [DivisionSemiring R] [AddCommMonoid M] [Module R M]
+variable {R α : Type*} [DivisionSemiring R]
 
 -- To go in `Dynamics/BirkhoffSum/Average`
--- `[CharZero R]` required for `Nat.cast_ne_zero`.
+-- Note: `[CharZero R]` required for `Nat.cast_ne_zero`.
 open Finset in
 /-- If a function `φ` is invariant under a function `f` (i.e., `φ ∘ f = φ`),
 then the Birkhoff average of `φ` over `f` for `n` iterations is equal to `φ`
 provided `0 < n`. -/
-theorem birkhoffAverage_of_invariant {f : α → α} [CharZero R]
-    {φ : α → M} (h : φ ∘ f = φ) {n : ℕ} (hn : 0 < n) : birkhoffAverage R f φ n = φ := by
+theorem birkhoffAverage_of_invariant {M : Type*} [AddCommMonoid M] [Module R M] [CharZero R]
+    {f : α → α} {φ : α → M} (h : φ ∘ f = φ) {n : ℕ} (hn : 0 < n) : birkhoffAverage R f φ n = φ := by
   funext x
   simp only [birkhoffAverage, birkhoffSum_of_invariant h, Pi.smul_apply]
   refine (inv_smul_eq_iff₀ ?_).mpr (by norm_cast)
   exact Nat.cast_ne_zero.mpr <| Nat.ne_zero_of_lt hn
 
 -- To go in `Dynamics/BirkhoffSum/Average`
-lemma birkhoffAverage_neg {φ : α → ℝ} :
-    birkhoffAverage ℝ f (-φ) = - birkhoffAverage ℝ f φ := by
+-- Note: need something more than `[AddCommMonoid M]` here to have subtraction.
+lemma birkhoffAverage_neg {M : Type*} [AddCommGroup M] [Module R M]
+    {f : α → α} {φ : α → M} :
+    birkhoffAverage R f (-φ) = - birkhoffAverage R f φ := by
   funext n x
   simp [birkhoffAverage, birkhoffSum]
 
 -- To go in `Dynamics/BirkhoffSum/Average`
 open Finset in
-lemma birkhoffAverage_add {φ ψ : α → ℝ} :
-    birkhoffAverage ℝ f (φ + ψ) = birkhoffAverage ℝ f φ + birkhoffAverage ℝ f ψ := by
+lemma birkhoffAverage_add {M : Type*} [AddCommGroup M] [Module R M] {f : α → α} {φ ψ : α → M} :
+    birkhoffAverage R f (φ + ψ) = birkhoffAverage R f φ + birkhoffAverage R f ψ := by
   funext n x
-  simp only [birkhoffAverage, birkhoffSum, Pi.add_apply, sum_add_distrib, smul_eq_mul]
-  linarith
+  simp [birkhoffAverage, birkhoffSum, sum_add_distrib]
 
 -- To go in `Dynamics/BirkhoffSum/Average`
 open Finset in
-lemma birkhoffAverage_sub {φ ψ : α → ℝ} :
-    birkhoffAverage ℝ f (φ - ψ) = birkhoffAverage ℝ f φ - birkhoffAverage ℝ f ψ := by
+lemma birkhoffAverage_sub {M : Type*} [AddCommGroup M] [Module R M] {f : α → α} {φ ψ : α → M} :
+    birkhoffAverage R f (φ - ψ) = birkhoffAverage R f φ - birkhoffAverage R f ψ := by
   funext n x
-  simp only [birkhoffAverage, birkhoffSum, Pi.sub_apply, sum_sub_distrib, smul_eq_mul]
-  linarith
+  simp [birkhoffAverage, birkhoffSum, smul_sub]
