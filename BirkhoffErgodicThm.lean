@@ -324,13 +324,12 @@ theorem birkhoffErgodicTheorem_aux {ε : ℝ} (hε : 0 < ε) (hf : MeasurePreser
   simp [ψ, birkhoffAverage_sub, birkhoffAverage_add, birkhoffAverage_of_invariant
     (show _ = fun _ ↦ ε from rfl) hn, birkhoffAverage_of_invariant condexpφ_invariant hn]
 
-theorem birkhoffErgodicTheorem  (hf : MeasurePreserving f μ μ) (hφ : Integrable φ μ)
-    (hφ' : Measurable φ) :
+/-- This is the main result but assuming `Measurable φ`. -/
+theorem birkhoffErgodicTheorem (hf : MeasurePreserving f μ μ) (hφ : Integrable φ μ) (hφ' : Measurable φ) :
     ∀ᵐ x ∂μ, Tendsto (birkhoffAverage ℝ f φ · x) atTop (𝓝 (invCondexp μ f φ x)) := by
   have : ∀ᵐ x ∂μ, ∀ (k : {k : ℕ // k > 0}),
-    ∀ᶠ n in atTop,
-      |birkhoffAverage ℝ f φ n x - (invCondexp μ f φ x)| < (k : ℝ)⁻¹
-  · apply ae_all_iff.mpr
+      ∀ᶠ n in atTop, |birkhoffAverage ℝ f φ n x - (invCondexp μ f φ x)| < (k : ℝ)⁻¹ := by
+    apply ae_all_iff.mpr
     rintro ⟨k, hk⟩
     let δ := (k : ℝ)⁻¹/2
     have hδ : δ > 0 := by simpa [δ]
@@ -366,3 +365,37 @@ theorem birkhoffErgodicTheorem  (hf : MeasurePreserving f μ μ) (hφ : Integrab
   rw [inv_lt_iff_one_lt_mul₀ (Nat.cast_pos.mpr k.succ_pos)]
   norm_num at hk' ⊢
   linarith
+
+
+lemma birkhoffAverage_eq_of_AEStronglyMeasurable {φ : α → ℝ} {μ : Measure α}
+    (h : AEStronglyMeasurable φ μ) (f : α → α) (n : ℕ) :
+    ∀ᵐ x ∂μ, birkhoffAverage ℝ f φ n x = birkhoffAverage ℝ f h.mk n x := by
+  sorry
+
+lemma invCondexp_eq_of_AEStronglyMeasurable {φ : α → ℝ}
+    [IsProbabilityMeasure μ] (h : AEStronglyMeasurable φ μ) (f : α → α) :
+    ∀ᵐ x ∂μ, invCondexp μ f φ x = invCondexp μ f h.mk x := by
+  sorry
+
+
+/-- Here we drop the assumption `Measurable φ`. -/
+theorem birkhoffErgodicTheorem' (hf : MeasurePreserving f μ μ) (hΦ : Integrable Φ μ) :
+    ∀ᵐ x ∂μ, Tendsto (birkhoffAverage ℝ f Φ · x) atTop (𝓝 (invCondexp μ f Φ x)) := by
+
+  let φ := hΦ.1.mk
+
+  have hφ' : Measurable φ := by
+    exact hΦ.left.measurable_mk
+
+  have hΦ' : Φ =ᶠ[ae μ] φ := by
+    exact hΦ.left.ae_eq_mk
+
+  have hφ : Integrable φ μ := by
+    exact (integrable_congr hΦ.left.ae_eq_mk).mp hΦ
+
+  have := birkhoffAverage_eq_of_AEStronglyMeasurable hΦ.left f
+  have := invCondexp_eq_of_AEStronglyMeasurable μ hΦ.left f
+  have := birkhoffErgodicTheorem μ hf hφ hφ'
+
+
+  sorry
