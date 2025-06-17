@@ -366,15 +366,26 @@ theorem birkhoffErgodicTheorem (hf : MeasurePreserving f μ μ) (hφ : Integrabl
   norm_num at hk' ⊢
   linarith
 
-
 lemma birkhoffAverage_eq_of_AEStronglyMeasurable {φ : α → ℝ} {μ : Measure α}
-    (h : AEStronglyMeasurable φ μ) (f : α → α) (n : ℕ) :
+    (h : AEStronglyMeasurable φ μ) (f : α → α) (hf : MeasurePreserving f μ μ) (n : ℕ) :
     ∀ᵐ x ∂μ, birkhoffAverage ℝ f φ n x = birkhoffAverage ℝ f h.mk n x := by
-  sorry
+  obtain ⟨s, hs, hs'⟩ := eventuallyEq_iff_exists_mem.mp h.ae_eq_mk
+  let t := {x | ∀ n, f^[n] x ∈ s}
+  have ht : t ∈ ae μ := by
+    refine mem_ae_iff.mpr ?_
+    rw [show tᶜ = ⋃ n, (f^[n])⁻¹' sᶜ by ext x; simp [t]]
+    refine measure_iUnion_null_iff.mpr fun n ↦ nonpos_iff_eq_zero.mp ?_
+    exact le_of_le_of_eq ((hf.iterate n).measure_preimage_le sᶜ) hs
+  refine EventuallyEq.eventually <| eventuallyEq_iff_exists_mem.mpr ⟨t, ht, fun x hx  ↦ ?_⟩
+  unfold birkhoffAverage birkhoffSum
+  congr
+  ext n
+  exact hs' <| hx n
 
 lemma invCondexp_eq_of_AEStronglyMeasurable {φ : α → ℝ}
     [IsProbabilityMeasure μ] (h : AEStronglyMeasurable φ μ) (f : α → α) :
     ∀ᵐ x ∂μ, invCondexp μ f φ x = invCondexp μ f h.mk x := by
+
   sorry
 
 
@@ -382,7 +393,7 @@ lemma invCondexp_eq_of_AEStronglyMeasurable {φ : α → ℝ}
 theorem birkhoffErgodicTheorem' (hf : MeasurePreserving f μ μ) (hΦ : Integrable Φ μ) :
     ∀ᵐ x ∂μ, Tendsto (birkhoffAverage ℝ f Φ · x) atTop (𝓝 (invCondexp μ f Φ x)) := by
 
-  let φ := hΦ.1.mk
+  let φ := hΦ.left.mk
 
   have hφ' : Measurable φ := by
     exact hΦ.left.measurable_mk
@@ -393,7 +404,7 @@ theorem birkhoffErgodicTheorem' (hf : MeasurePreserving f μ μ) (hΦ : Integrab
   have hφ : Integrable φ μ := by
     exact (integrable_congr hΦ.left.ae_eq_mk).mp hΦ
 
-  have := birkhoffAverage_eq_of_AEStronglyMeasurable hΦ.left f
+  have := birkhoffAverage_eq_of_AEStronglyMeasurable hΦ.left f hf
   have := invCondexp_eq_of_AEStronglyMeasurable μ hΦ.left f
   have := birkhoffErgodicTheorem μ hf hφ hφ'
 
