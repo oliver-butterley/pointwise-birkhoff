@@ -366,6 +366,7 @@ theorem birkhoffErgodicTheorem (hf : MeasurePreserving f μ μ) (hφ : Integrabl
   norm_num at hk' ⊢
   linarith
 
+-- TO DO: refactor this as a separate lemma which applies to any `f, g` with are `ae μ` equal.
 lemma birkhoffAverage_eq_of_AEStronglyMeasurable {φ : α → ℝ} {μ : Measure α}
     (h : AEStronglyMeasurable φ μ) (f : α → α) (hf : MeasurePreserving f μ μ) (n : ℕ) :
     ∀ᵐ x ∂μ, birkhoffAverage ℝ f φ n x = birkhoffAverage ℝ f h.mk n x := by
