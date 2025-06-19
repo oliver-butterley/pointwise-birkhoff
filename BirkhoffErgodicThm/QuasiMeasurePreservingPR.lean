@@ -12,7 +12,7 @@ This file contains some lemmas about the `birkhoffSum` and `birkhoffAverage` of 
 `QuasiMeasurePreserving`.
 -/
 
-section MeasurePreserving
+section QuasiMeasurePreserving
 
 open MeasureTheory Measure Filter
 
@@ -37,4 +37,4 @@ theorem birkhoffAverage_ae_eq_of_ae_eq (R : Type*) [DivisionSemiring R] [Module 
     birkhoffAverage R f φ n =ᵐ[μ] birkhoffAverage R f φ' n :=
   EventuallyEq.const_smul (birkhoffSum_ae_eq_of_ae_eq hf hφ n) (n : R)⁻¹
 
-end MeasurePreserving
+end QuasiMeasurePreserving
