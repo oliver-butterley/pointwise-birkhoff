@@ -2,6 +2,7 @@ import BirkhoffErgodicThm.BirkhoffSumPR
 import BirkhoffErgodicThm.InvariantsPR
 import BirkhoffErgodicThm.PartialSupsPR
 import BirkhoffErgodicThm.FilterPR
+import BirkhoffErgodicThm.QuasiMeasurePreservingPR
 
 section BirkhoffMax
 
@@ -55,7 +56,7 @@ end BirkhoffMax
 
 noncomputable section BirkhoffThm
 
-open MeasureTheory MeasurableSpace Filter Topology
+open MeasureTheory Measure MeasurableSpace Filter Topology
 
 variable {α : Type*} [msα : MeasurableSpace α] (μ : Measure α := by volume_tac)
 
@@ -366,48 +367,20 @@ theorem birkhoffErgodicTheorem (hf : MeasurePreserving f μ μ) (hφ : Integrabl
   norm_num at hk' ⊢
   linarith
 
--- TO DO: refactor this as a separate lemma which applies to any `f, g` with are `ae μ` equal.
-lemma birkhoffAverage_eq_of_AEStronglyMeasurable {φ : α → ℝ} {μ : Measure α}
-    (h : AEStronglyMeasurable φ μ) (f : α → α) (hf : MeasurePreserving f μ μ) (n : ℕ) :
-    ∀ᵐ x ∂μ, birkhoffAverage ℝ f φ n x = birkhoffAverage ℝ f h.mk n x := by
-  obtain ⟨s, hs, hs'⟩ := eventuallyEq_iff_exists_mem.mp h.ae_eq_mk
-  let t := {x | ∀ n, f^[n] x ∈ s}
-  have ht : t ∈ ae μ := by
-    refine mem_ae_iff.mpr ?_
-    rw [show tᶜ = ⋃ n, (f^[n])⁻¹' sᶜ by ext x; simp [t]]
-    refine measure_iUnion_null_iff.mpr fun n ↦ nonpos_iff_eq_zero.mp ?_
-    exact le_of_le_of_eq ((hf.iterate n).measure_preimage_le sᶜ) hs
-  refine EventuallyEq.eventually <| eventuallyEq_iff_exists_mem.mpr ⟨t, ht, fun x hx  ↦ ?_⟩
-  unfold birkhoffAverage birkhoffSum
-  congr
-  ext n
-  exact hs' <| hx n
-
-lemma invCondexp_eq_of_AEStronglyMeasurable {φ : α → ℝ}
-    [IsProbabilityMeasure μ] (h : AEStronglyMeasurable φ μ) (f : α → α) :
-    ∀ᵐ x ∂μ, invCondexp μ f φ x = invCondexp μ f h.mk x := by
-
-  sorry
-
-
-/-- Here we drop the assumption `Measurable φ`. -/
-theorem birkhoffErgodicTheorem' (hf : MeasurePreserving f μ μ) (hΦ : Integrable Φ μ) :
+/-- Here we drop the assumption that the observable is `Measurable`. -/
+theorem birkhoffErgodicTheorem' {Φ : α → ℝ} (hf : MeasurePreserving f μ μ) (hΦ : Integrable Φ μ) :
     ∀ᵐ x ∂μ, Tendsto (birkhoffAverage ℝ f Φ · x) atTop (𝓝 (invCondexp μ f Φ x)) := by
-
+  -- Take `φ` as the measurable approximation to the ae measurable `Φ`.
   let φ := hΦ.left.mk
-
-  have hφ' : Measurable φ := by
-    exact hΦ.left.measurable_mk
-
-  have hΦ' : Φ =ᶠ[ae μ] φ := by
-    exact hΦ.left.ae_eq_mk
-
-  have hφ : Integrable φ μ := by
-    exact (integrable_congr hΦ.left.ae_eq_mk).mp hΦ
-
-  have := birkhoffAverage_eq_of_AEStronglyMeasurable hΦ.left f hf
-  have := invCondexp_eq_of_AEStronglyMeasurable μ hΦ.left f
-  have := birkhoffErgodicTheorem μ hf hφ hφ'
-
-
-  sorry
+  have hφ' : Measurable φ := hΦ.left.measurable_mk
+  have hΦ' : Φ =ᵐ[μ] φ := hΦ.left.ae_eq_mk
+  have hφ : Integrable φ μ := (integrable_congr hΦ.left.ae_eq_mk).mp hΦ
+  -- Obtain a full measure set such that the three relevant results hold.
+  obtain ⟨s, hs, hs'⟩ : ∃ s ∈ ae μ, Set.EqOn (invCondexp μ f Φ) (invCondexp μ f φ) s :=
+    eventuallyEq_iff_exists_mem.mp <| condExp_congr_ae hΦ'
+  obtain ⟨t, ht, ht'⟩ := eventually_iff_exists_mem.mp <| birkhoffErgodicTheorem μ hf hφ hφ'
+  have := ae_all_iff.mpr <| birkhoffAverage_ae_eq_of_ae_eq ℝ hf.quasiMeasurePreserving hΦ'
+  obtain ⟨u, hu, hu'⟩ := eventually_iff_exists_mem.mp this
+  -- Apply the three results on the chosen set.
+  refine eventually_iff_exists_mem.mpr ⟨s ∩ t ∩ u, inter_mem (inter_mem hs ht) hu, fun y hy ↦ ?_⟩
+  simp [hs' hy.1.1, ht' y hy.1.2, hu' y hy.2]
