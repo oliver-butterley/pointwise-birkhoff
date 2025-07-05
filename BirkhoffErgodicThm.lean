@@ -151,7 +151,7 @@ lemma birkhoffAverage_tendsto_nonpos_of_not_mem_divergentSet
 
   /- the upper bound is, in fact, a real number -/
   cases' M' using EReal.rec with M
-  case bot => exfalso; exact (EReal.bot_lt_coe _).not_le (M_is_bound 0)
+  case bot => exfalso; exact (EReal.bot_lt_coe _).not_ge (M_is_bound 0)
   case top => contradiction
   norm_cast at M_is_bound
 
@@ -270,7 +270,7 @@ lemma divergentSet_zero_meas_of_condexp_neg
         exact (le_trans (invariants_le f) nullMeasurableSpace_le)
     · exact ae_le_of_ae_lt pos
     · exact integrable_condExp.restrict.neg
-  exact this.not_le (int_in_divergentSet_nonneg μ hf hφ hφ')
+  exact this.not_ge (int_in_divergentSet_nonneg μ hf hφ hφ')
 
 lemma limsup_birkhoffAverage_nonpos_of_condexp_neg (hf : MeasurePreserving f μ μ)
     (hφ : Integrable φ μ) (hφ' : Measurable φ) (h : ∀ᵐ x ∂μ, (μ[φ|invariants f]) x < 0) :
