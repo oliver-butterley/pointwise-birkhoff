@@ -1,0 +1,24 @@
+name = "BirkhoffErgodicThm"
+version = "0.1.0"
+keywords = ["math"]
+defaultTargets = ["BirkhoffErgodicThm"]
+
+[leanOptions]
+pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+# autoImplicit = false
+
+# [package]
+# name = "BirkhoffErgodicThm"
+# add any package configuration options here
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+# scope = "leanprover-community"
+
+
+[[lean_lib]]
+name = "BirkhoffErgodicThm"
+# add any library configuration options here
+
+
