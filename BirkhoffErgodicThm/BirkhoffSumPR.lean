@@ -3,11 +3,9 @@ import Mathlib
 -- To go in `Logic/Function/Iterate`? Name as `iterate_of_invariant`?
 /-- If a function `φ` is invariant under a function `f` (i.e., `φ ∘ f = φ`),
 then `φ` remains invariant under any number of iterations of `f`. -/
-lemma invariant_iter (h : φ ∘ f = φ) : ∀ i, φ ∘ f^[i] = φ
+lemma iterate_invariant (h : φ ∘ f = φ) : ∀ i, φ ∘ f^[i] = φ
   | 0 => rfl
-  | n + 1 => by
-    change (φ ∘ f^[n]) ∘ f = φ
-    rwa [invariant_iter h n]
+  | n + 1 => by rwa [show  φ ∘ f^[n + 1] = (φ ∘ f^[n]) ∘ f  by rfl, iterate_invariant h n]
 
 -- To go in `Dynamics/BirkhoffSum/Basic`
 open Finset in
@@ -17,7 +15,7 @@ theorem birkhoffSum_of_invariant [AddCommMonoid M] {φ : α → M}
     (h : φ ∘ f = φ) : birkhoffSum f φ n = n • φ := by
   funext x
   unfold birkhoffSum
-  conv in fun _ => _ => intro k; change (φ ∘ f^[k]) x; rw [invariant_iter h k]
+  simp_rw [show ∀ k, φ (f^[k] x) = (φ ∘ f^[k]) x by exact fun k ↦ rfl, iterate_invariant h]
   simp
 
 variable {R α : Type*} [DivisionSemiring R]
