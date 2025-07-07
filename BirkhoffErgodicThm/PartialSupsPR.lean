@@ -1,20 +1,25 @@
-import Mathlib
+import Mathlib.Algebra.Order.Group.OrderIso
+import Mathlib.Data.Nat.SuccPred
+import Mathlib.Order.PartialSups
+import Mathlib.Order.SuccPred.LinearLocallyFinite
 
 -- To be added to `Mathlib/Order/PartialSups`.
 -- Correct name? I think it should be `comp` not `map`:
 -- [https://leanprover-community.github.io/contribute/naming.html#names-of-symbols]
-lemma map_partialSups {α β F ι : Type*} [Preorder ι] [LocallyFiniteOrderBot ι]
+lemma comp_partialSups {α β F ι : Type*} [Preorder ι] [LocallyFiniteOrderBot ι]
     [SemilatticeSup α] [SemilatticeSup β] [FunLike F α β] [SupHomClass F α β]
     (f : ι → α) (g : F) : partialSups (g ∘ f) = g ∘ partialSups f := by
   funext _; simp [partialSups]
 
 -- To be added to `Mathlib/Order/PartialSups`. Correct name?
-open OrderIso in
-lemma add_partialSups {ι α : Type*} [Preorder ι] [LocallyFiniteOrderBot ι] [Lattice α] [AddGroup α]
-    [CovariantClass α α ((· + ·)) (· ≤ ·)] (f : ι → α) (c : α) (i : ι) :
+-- open OrderIso in
+lemma partialSups_const_add {ι α : Type*} [Preorder ι] [LocallyFiniteOrderBot ι] [Lattice α] [AddGroup α]
+    [CovariantClass α α ((· + ·)) (· ≤ ·)]
+    (f : ι → α) (c : α) (i : ι) :
     partialSups (c + f ·) i = c + partialSups f i := by
-  change (partialSups (addLeft c ∘ _)) i = _
-  rw [map_partialSups f (addLeft c)]; rfl
+  change (partialSups (OrderIso.addLeft c ∘ f)) i = _
+  rw [comp_partialSups f (OrderIso.addLeft c)]
+  rfl
 
 /- Note for curiosity with `partialSups_succ'`: In `partialSups_succ` slightly weaker assumptions on
 `ι` are used: `[LinearOrder ι] [LocallyFiniteOrderBot ι] [SuccOrder ι]`. However using just this
@@ -23,7 +28,7 @@ set and perhaps it can't use the hypothesis to exclude this and guarantee the ex
 The assumptions used here match those of `partialSups_bot` in the same file. -/
 
 -- To be added to `Mathlib/Order/PartialSups`
-open Finset in
+-- open Finset in
 lemma partialSups_succ' {α ι : Type*} [SemilatticeSup α] [LinearOrder ι]
     [LocallyFiniteOrder ι] [SuccOrder ι] [OrderBot ι] (f : ι → α) (i : ι) :
     (partialSups f) (Order.succ i) = f ⊥ ⊔ (partialSups (f ∘ Order.succ)) i := by

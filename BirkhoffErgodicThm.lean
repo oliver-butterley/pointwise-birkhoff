@@ -17,7 +17,7 @@ lemma birkhoffMax_succ : birkhoffMax f φ n.succ x = φ x + 0 ⊔ birkhoffMax f 
     funext k x; dsimp
     rw [add_comm k 1, birkhoffSum_add f φ 1, birkhoffSum_one];
     rfl
-  nth_rw 1 [birkhoffMax, this, add_partialSups]
+  nth_rw 1 [birkhoffMax, this, partialSups_const_add]
   simp only [Pi.add_apply, add_right_inj]
   rw [partialSups_add_one']
   simp only [birkhoffSum_zero', Pi.zero_comp, Pi.sup_apply, Pi.zero_apply]
