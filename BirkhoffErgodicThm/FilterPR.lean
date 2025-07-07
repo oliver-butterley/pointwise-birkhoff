@@ -1,4 +1,4 @@
-import Mathlib.Tactic
+import Mathlib.Order.Filter.Basic
 
 namespace Filter.EventuallyEq
 

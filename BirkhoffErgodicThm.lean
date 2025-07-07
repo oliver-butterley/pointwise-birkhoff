@@ -1,8 +1,17 @@
 import BirkhoffErgodicThm.BirkhoffSumPR
+import BirkhoffErgodicThm.FilterPR
 import BirkhoffErgodicThm.InvariantsPR
 import BirkhoffErgodicThm.PartialSupsPR
-import BirkhoffErgodicThm.FilterPR
 import BirkhoffErgodicThm.QuasiMeasurePreservingPR
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Analysis.SpecialFunctions.Log.ENNRealLogExp
+import Mathlib.Data.Real.StarOrdered
+import Mathlib.GroupTheory.MonoidLocalization.Basic
+import Mathlib.MeasureTheory.Constructions.Polish.Basic
+import Mathlib.MeasureTheory.Function.ConditionalExpectation.Basic
+import Mathlib.MeasureTheory.Integral.DominatedConvergence
+import Mathlib.Topology.EMetricSpace.Paracompact
+import Mathlib.Topology.Separation.CompletelyRegular
 
 section BirkhoffMax
 
@@ -156,12 +165,12 @@ lemma birkhoffAverage_tendsto_nonpos_of_not_mem_divergentSet
   norm_cast at M_is_bound
 
   /- use archimedian property of reals -/
-  cases' Archimedean.arch M hε with N hN
-  have upperBound (n : ℕ) (hn : N ≤ n) : birkhoffAverage ℝ f φ (n + 1) x < ε
-  · have : M < (n + 1) • ε
-    · exact hN.trans_lt $ smul_lt_smul_of_pos_right (Nat.lt_succ_of_le hn) hε
-    · rw [nsmul_eq_mul] at this
-      exact (inv_smul_lt_iff_of_pos (Nat.cast_pos.mpr (Nat.zero_lt_succ n))).mpr
+  obtain ⟨N, hN⟩ := Archimedean.arch M hε
+  have upperBound (n : ℕ) (hn : N ≤ n) : birkhoffAverage ℝ f φ (n + 1) x < ε := by
+    have : M < (n + 1) • ε := by
+      exact hN.trans_lt $ smul_lt_smul_of_pos_right (Nat.lt_succ_of_le hn) hε
+    rw [nsmul_eq_mul] at this
+    exact (inv_smul_lt_iff_of_pos (Nat.cast_pos.mpr (Nat.zero_lt_succ n))).mpr
         ((M_is_bound n).trans_lt this)
 
   /- conclusion -/
@@ -220,8 +229,8 @@ lemma int_birkhoffMaxDiff_in_divergentSet_nonneg (hf : MeasurePreserving f μ μ
     (hφ : Integrable φ μ) (hφ' : Measurable φ) :
     0 ≤ ∫ x in divergentSet f φ, birkhoffMaxDiff f φ n x ∂μ := by
   unfold birkhoffMaxDiff
-  have : (μ.restrict (divergentSet f φ)).map f = μ.restrict (divergentSet f φ)
-  · nth_rw 1 [
+  have : (μ.restrict (divergentSet f φ)).map f = μ.restrict (divergentSet f φ) := by
+    nth_rw 1 [
       ← (divergentSet_mem_invalg hf.measurable hφ').2,
       ← μ.restrict_map hf.measurable (divergentSet_measurable hf.measurable hφ'),
       hf.map_eq
@@ -253,12 +262,12 @@ lemma divergentSet_zero_meas_of_condexp_neg
     (h : ∀ᵐ x ∂μ, (μ[φ|invariants f]) x < 0) (hf : MeasurePreserving f μ μ)
     (hφ : Integrable φ μ) (hφ' : Measurable φ) :
     μ (divergentSet f φ) = 0 := by
-  have pos : ∀ᵐ x ∂μ.restrict (divergentSet f φ), 0 < -(μ[φ|invariants f]) x
-  · exact ae_restrict_of_ae (h.mono fun _ hx ↦ neg_pos.mpr hx)
+  have pos : ∀ᵐ x ∂μ.restrict (divergentSet f φ), 0 < -(μ[φ|invariants f]) x := by
+    exact ae_restrict_of_ae (h.mono fun _ hx ↦ neg_pos.mpr hx)
   have ds_meas := divergentSet_mem_invalg hf.measurable hφ'
   by_contra hm; simp_rw [← pos_iff_ne_zero] at hm
-  have : ∫ x in divergentSet f φ, φ x ∂μ < 0
-  · rw [← setIntegral_condExp (invariants_le f) hφ ds_meas,
+  have : ∫ x in divergentSet f φ, φ x ∂μ < 0 := by
+    rw [← setIntegral_condExp (invariants_le f) hφ ds_meas,
       ← Left.neg_pos_iff, ← integral_neg, integral_pos_iff_support_of_nonneg_ae]
     · unfold Function.support
       rw [(ae_iff_measure_eq _).mp]
@@ -301,8 +310,8 @@ theorem birkhoffErgodicTheorem_aux {ε : ℝ} (hε : 0 < ε) (hf : MeasurePreser
     _ = - μ[fun _ ↦ ε|invariants f] := by simp
     _ = - fun _ ↦ ε := by rw [condExp_const (invariants_le f)]
 
-  have limsup_nonpos : ∀ᵐ x ∂μ, Tendsto (birkhoffAverage ℝ f ψ · x) atTop nonneg
-  · suffices ∀ᵐ x ∂μ, invCondexp μ f ψ x < 0 from
+  have limsup_nonpos : ∀ᵐ x ∂μ, Tendsto (birkhoffAverage ℝ f ψ · x) atTop nonneg := by
+    suffices ∀ᵐ x ∂μ, invCondexp μ f ψ x < 0 from
       limsup_birkhoffAverage_nonpos_of_condexp_neg μ hf ψ_integrable ψ_measurable this
     exact condexpψ_const.mono fun x hx ↦ by simp [hx, hε]
 
@@ -356,8 +365,8 @@ theorem birkhoffErgodicTheorem (hf : MeasurePreserving f μ μ) (hφ : Integrabl
 
   refine this.mono fun x hx => Metric.tendsto_atTop.mpr fun ε hε => ?_
   cases' Archimedean.arch 1 hε with k hk
-  have hk' : 1 < (k + 1) • ε
-  · exact hk.trans_lt $ smul_lt_smul_of_pos_right (lt_add_one k) hε
+  have hk' : 1 < (k + 1) • ε :=
+    hk.trans_lt $ smul_lt_smul_of_pos_right (lt_add_one k) hε
   simp only [eventually_atTop, ge_iff_le, Subtype.forall, gt_iff_lt] at hx
   cases' hx k.succ (Nat.zero_lt_succ k) with N hN
   use N

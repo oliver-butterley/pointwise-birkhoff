@@ -1,4 +1,4 @@
-import Mathlib
+import Mathlib.Dynamics.BirkhoffSum.Average
 
 -- To go in `Logic/Function/Iterate`? Name as `iterate_of_invariant`?
 /-- If a function `φ` is invariant under a function `f` (i.e., `φ ∘ f = φ`),
@@ -40,12 +40,14 @@ lemma birkhoffAverage_neg {M : Type*} [AddCommGroup M] [Module R M] {f : α → 
   funext n x
   simp [birkhoffAverage, birkhoffSum]
 
+variable (R : Type*) {α M : Type*} [DivisionSemiring R] [AddCommMonoid M] [Module R M]
+
 -- To go in `Dynamics/BirkhoffSum/Average`
 open Finset in
-lemma birkhoffAverage_add {M : Type*} [AddCommMonoid M] [Module R M] {f : α → α} {φ ψ : α → M} :
-    birkhoffAverage R f (φ + ψ) = birkhoffAverage R f φ + birkhoffAverage R f ψ := by
+lemma birkhoffAverage_add {f : α → α} {g g' : α → M} :
+    birkhoffAverage R f (g + g') = birkhoffAverage R f g + birkhoffAverage R f g' := by
   funext n x
-  simp [birkhoffAverage, birkhoffSum, sum_add_distrib]
+  simp [birkhoffAverage, birkhoffSum, sum_add_distrib, smul_add]
 
 -- To go in `Dynamics/BirkhoffSum/Average`
 -- Note: need something more than `[AddCommMonoid M]` here to have subtraction.
